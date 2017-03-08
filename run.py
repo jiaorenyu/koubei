@@ -6,7 +6,7 @@ from common import *
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 7:
+    if len(sys.argv) != 8:
         print("usage:  python sample.py pay_file view_file start_date end_date split_dir stat_dir")
         exit()
         
@@ -16,6 +16,8 @@ if __name__ == "__main__":
     end_date = sys.argv[4]
     split_dir = sys.argv[5]
     stat_dir = sys.argv[6]
+    shop_count = int(sys.argv[7])
+
     # 拆分shop    
     handle_split(split_dir, user_pay_action, user_view_action)
     
@@ -25,15 +27,17 @@ if __name__ == "__main__":
     cost = 0
 
     # 对总共2000个shop进行模型训练，并使用训练的参数预测2016-11-01~2016-11-14日的客流量
-    for i in range(2000):
+    for i in range(shop_count):
+        i+= 1988
         pay_fn = os.path.join(stat_dir, str(i+1)+"_"+"pay_stat_sorted")
-        view_fn = os.path.join(stat_dir, str(i+1)+"_"+"view_stat_sorted")
-        cost += handle_predict_v2(i+1, pay_fn, view_fn, start_date, end_date)
+        #view_fn = os.path.join(stat_dir, str(i+1)+"_"+"view_stat_sorted")
+        #cost += handle_predict_v2(i+1, pay_fn, view_fn, start_date, end_date)
+        handle_arima(i+1, pay_fn)
     
-    cost = cost/(2000)
+    #cost = cost/(shop_count)
     
     # 误差
-    print(cost)
+    #print(cost)
 
     
 

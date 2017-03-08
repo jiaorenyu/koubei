@@ -6,7 +6,7 @@ import numpy as np
 import file_util
 import time_util
 import date_util
-import train
+import arima_util
 
 def parse_user_action(line):
     line = line.strip()
@@ -271,7 +271,7 @@ def shop_cost(predict_list, real_list):
         predict = predict_list[i]
         real = real_list[i]
 
-        cost += abs(predict - real)*1.0/(predict + real)
+        cost += abs(predict - real)*1.0/(predict + real + 0.1)
 
     return cost/len(predict_list)
 
@@ -284,26 +284,32 @@ def handle_predict_v2(shop_id, pay_fn, view_fn, start_date, end_date):
     predict_list = []
     real_list = []
     for predict_no, sample_list in predict_count_sample.items():
+        if len(sample_list) <= 14:
+            predict_list.append(0)
+            real_list.append(0)
+            continue
+
         p = train.train(sample_list)
         
         if p == None:
             predict_list.append(0)
+            real_list.append(0)
             continue
         sample, real_pay_count = get_latest_sample("2016-10-11", "2016-10-18", predict_no, pay_action_count, view_action_count)
         
-        sample = map(int, sample)
+        sample = list(map(int, sample))
         rt = np.sum(np.multiply(p, sample))
-        predict_list.append(rt)
+        predict_list.append(rt )
         real_list.append(int(real_pay_count))
 
 
-    predict_list = map(post_handle, predict_list)
+    predict_list = (map(post_handle, predict_list))
     
     result = []
     result.append(shop_id)
     result += predict_list
 
-    result = map(str, result)
+    result = list(map(str, result))
 
     if len(result) != 15:
         print("error")
@@ -327,11 +333,11 @@ def handle_predict(shop_id, pay_fn, view_fn, start_date, end_date):
             predict_list.append(0)
             continue
         sample = get_latest_sample_pay("2016-10-24", "2016-10-31", pay_action_count)
-        sample = map(int, sample)
+        sample = (map(int, sample))
         rt = np.sum(np.multiply(p, sample))
         predict_list.append(rt)
 
-    predict_list = map(post_handle, predict_list)
+    predict_list = (map(post_handle, predict_list))
 
     result = []
     result.append(shop_id)
@@ -339,9 +345,11 @@ def handle_predict(shop_id, pay_fn, view_fn, start_date, end_date):
     result += predict_list  # 周一到周日
     result += predict_list[0:1] # 周一
 
-    result = map(str, result)
+    result = (map(str, result))
 
     print(",".join(result))
 
-
-
+def handle_arima(shop_id, pay_fn):
+    count, index = arima_util.get_history_pay(pay_fn)
+    result = arima_util.arima(count, index)
+    print(str(shop_id) + "," + result)
