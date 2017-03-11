@@ -349,7 +349,12 @@ def handle_predict(shop_id, pay_fn, view_fn, start_date, end_date):
 
     print(",".join(result))
 
-def handle_arima(shop_id, pay_fn):
-    count, index = arima_util.get_history_pay(pay_fn)
-    result = arima_util.arima(count, index)
+def handle_arima(shop_id, pay_fn, start_date, end_date, predict_start, predict_end):
+    action_count = load_action_stat(pay_fn)
+    count, index, real_list = arima_util.get_history_pay(action_count, start_date, end_date, predict_start, predict_end)
+    predict_list = arima_util.arima(count, index, len(real_list))
+    cost = shop_cost(predict_list, real_list)
+    result = ",".join(list(map(str, predict_list)))
     print(str(shop_id) + "," + result)
+    print(cost)
+    return cost

@@ -28,16 +28,15 @@ if __name__ == "__main__":
 
     # 对总共2000个shop进行模型训练，并使用训练的参数预测2016-11-01~2016-11-14日的客流量
     for i in range(shop_count):
-        i+= 1988
         pay_fn = os.path.join(stat_dir, str(i+1)+"_"+"pay_stat_sorted")
         #view_fn = os.path.join(stat_dir, str(i+1)+"_"+"view_stat_sorted")
         #cost += handle_predict_v2(i+1, pay_fn, view_fn, start_date, end_date)
-        handle_arima(i+1, pay_fn)
+        cost += handle_arima(i+1, pay_fn, start_date, end_date, "2016-10-17", "2016-11-01")
     
-    #cost = cost/(shop_count)
+    cost = cost/(shop_count)
     
     # 误差
-    #print(cost)
+    print(cost)
 
     
 

@@ -8,6 +8,7 @@ from matplotlib.ticker import MultipleLocator, FuncFormatter
 import time_util
 
 def formatter(x, pos):
+    return x
     return time_util.get_datestr(x, "%a")
 
 def parse_line(line):
@@ -31,14 +32,16 @@ if __name__ == "__main__":
             day_list.append(day)
             count_list.append(count)
 
-        pl.plot(map(time_util.get_timestamp, day_list), count_list)
-    
+        #pl.plot(map(time_util.get_timestamp, day_list), count_list)
+        pl.plot(count_list)
+        
+        '''
         ax = pl.gca()
-        xmajorLocator   = MultipleLocator(3600*24)
+        xmajorLocator   = MultipleLocator(24*3600)
         xmajorFormatter = FuncFormatter(formatter)
 
         #设置主刻度标签的位置,标签文本的格式  
         ax.xaxis.set_major_locator(xmajorLocator)  
         ax.xaxis.set_major_formatter(xmajorFormatter)
-
+        '''
         pl.show()
